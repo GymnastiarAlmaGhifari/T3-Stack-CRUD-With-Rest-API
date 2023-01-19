@@ -37,7 +37,7 @@ const Home: NextPage = () => {
               href="https://create.t3.gg/en/introduction"
               target="_blank"
             >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
+              <h3 className="text-2xl font-bold">Docwaawdawdad  dawqdqwdqwdqwwdawdawdaon →</h3>
               <div className="text-lg">
                 Learn more about Create T3 App, the libraries it uses, and how
                 to deploy it.
