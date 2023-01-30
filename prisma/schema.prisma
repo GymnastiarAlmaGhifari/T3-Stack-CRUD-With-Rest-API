@@ -71,3 +71,13 @@ model Administrator {
     email    String  @unique
     password String
 }
+
+model books{
+    id String @id @default(cuid())
+    title String
+    author String
+    description String
+    price Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
