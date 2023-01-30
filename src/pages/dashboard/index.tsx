@@ -1,4 +1,4 @@
-import { type NextPage } from "next";
+import { GetServerSidePropsContext, type NextPage } from "next";
 import { signOut, useSession, getSession } from "next-auth/react";
 import Head from "next/head";
 import { Fragment, useState } from "react";
@@ -26,7 +26,6 @@ const Dashboard: NextPage = () => {
         // hapus session
     };
 
-    const { data: allBooks, isLoading } = api.books?.allBooks.useQuery();
 
     const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -34,12 +33,6 @@ const Dashboard: NextPage = () => {
     const addBooks = api.books.createBook.useMutation({
         onMutate: () => {
             utils.books.allBooks.cancel().then(console.log).catch(console.error);
-
-            const optimisticUpdate = utils.books.allBooks.getData();
-
-            if (optimisticUpdate) {
-                utils.books.allBooks.setData(optimisticUpdate);
-            }
         },
         onSettled: () => {
             utils.books.allBooks.invalidate().then(console.log).catch(console.error);
@@ -50,6 +43,7 @@ const Dashboard: NextPage = () => {
         title: "",
         author: "",
         description: "",
+        price: 0
     });
 
     const handleTitileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +75,6 @@ const Dashboard: NextPage = () => {
     };
 
 
-    if (isLoading) return <>Loading...</>;
 
     return (
         <>
@@ -204,25 +197,7 @@ const Dashboard: NextPage = () => {
                     </Modal>
 
                     {/*mapping list books dari allBooks */}
-                    <div className="flex flex-col gap-3 mx-24 mt-12">
-                        {allBooks.map((book) => (
-                            <div key={book.id} className="flex flex-row gap-3 items-center">
-                                <div className="flex flex-row gap-3">
-                                    <p className="text-xl font-bold">{book.title}</p>
-                                    <p className="text-xl font-bold">{book.author}</p>
-                                    <p className="text-xl font-bold">{book.price}</p>
-                                </div>
-                                <div className="flex flex-row gap-3">
-                                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                        {"Edit"}
-                                    </button>
-                                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                        {"Delete"}
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <ListBooks />
 
 
                 </Fragment>
@@ -234,8 +209,40 @@ const Dashboard: NextPage = () => {
 
 export default Dashboard;
 
-export const getServerSideProps = async ({ req }) => {
-    const session = await getSession({ req });
+const ListBooks: React.FC = () => {
+
+    const { data: allBooks, isLoading } = api.books?.allBooks.useQuery();
+
+    if (isLoading) return <>Loading...</>;
+
+    return (
+        <>
+            <div className="flex flex-col gap-3 mx-24 mt-12">
+                {allBooks?.map((book) => (
+                    <div key={book.id} className="flex flex-row gap-3 items-center">
+                        <div className="flex flex-row gap-3">
+                            <p className="text-xl font-bold">{book.title}</p>
+                            <p className="text-xl font-bold">{book.author}</p>
+                            <p className="text-xl font-bold">{book.price}</p>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                {"Edit"}
+                            </button>
+                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                {"Delete"}
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </>
+    );
+}
+
+
+export const getServerSideProps = async (context: GetServerSidePropsContext,) => {
+    const session = await getSession(context);
 
     if (!session) {
         return {
