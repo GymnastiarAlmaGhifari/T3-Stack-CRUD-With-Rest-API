@@ -2,8 +2,11 @@ import { GetServerSidePropsContext, type NextPage } from "next";
 import { signOut, useSession, getSession } from "next-auth/react";
 import Head from "next/head";
 import { Fragment, useState } from "react";
-import Modal from "../components/common/Modal";
+import { Modal, ModalActions, ModalDetail, ModalForm } from "../components/common/Modal";
 import { api } from "../../utils/api";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import BookDetail from "../components/common/BookDetail";
 
 interface FormData {
     title: string;
@@ -28,6 +31,8 @@ const Dashboard: NextPage = () => {
 
 
     const [showModal, setShowModal] = useState<boolean>(false);
+
+
 
     const utils = api.useContext();
     const addBooks = api.books.createBook.useMutation({
@@ -74,7 +79,13 @@ const Dashboard: NextPage = () => {
         });
     };
 
+    const router = useRouter();
 
+    const backDashboard = () => {
+        router.push("/dashboard").then(console.log).catch(console.error);
+    };
+
+    const { data: allBooks, isLoading } = api.books?.allBooks.useQuery();
 
     return (
         <>
@@ -101,103 +112,182 @@ const Dashboard: NextPage = () => {
                     {/* button modal create books */}
                     <div className="flex mx-24 mt-12">
                         <button onClick={() => setShowModal(true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            {"Create Books"}
+                            {"Create Book"}
                         </button>
                     </div>
                     {/* modal create books */}
-                    <Modal isVisible={showModal} onClose={() => setShowModal(false)}>
-                        <form
-                            onSubmit={
-                                (e) => {
-                                    e.preventDefault();
-                                    addBooks.mutate({
-                                        title: data.title,
-                                        author: data.author,
-                                        description: data.description,
-                                        price: data.price
-                                    });
-                                    setData({
-                                        title: "",
-                                        author: "",
-                                        description: "",
-                                        price: 0
-                                    })
-                                    setShowModal(false)
-                                }}
-                        >
-                            <div className="flex flex-col gap-3">
-                                <label htmlFor="title">Title</label>
-                                <input
-                                    className="border-2 border-gray-300 p-2 rounded-lg"
-                                    type="text"
-                                    name="title"
-                                    id="title"
-                                    required
-                                    placeholder="title of book"
-                                    value={data.title}
-                                    onChange={
-                                        (e) => {
-                                            handleTitileChange(e);
-                                        }
-                                    } />
+                    <Modal
+                        title={"Create Book"}
+                        description="Create your book"
+                        isOpen={showModal}
+                        handleCancel={() => setShowModal(false)}
+                    >
+                        <ModalForm>
+                            {/*mapping list books dari allBooks */}
+                            <form
+                                onSubmit={
+                                    (e) => {
+                                        e.preventDefault();
+                                        addBooks.mutate({
+                                            title: data.title,
+                                            author: data.author,
+                                            description: data.description,
+                                            price: data.price
+                                        });
+                                        setData({
+                                            title: "",
+                                            author: "",
+                                            description: "",
+                                            price: 0
+                                        })
+                                        setShowModal(false)
+                                    }}
+                            >
+                                <div className="flex flex-col gap-3">
+                                    <label htmlFor="title">Title</label>
+                                    <input
+                                        className="border-2 border-gray-300 p-2 rounded-lg"
+                                        type="text"
+                                        name="title"
+                                        id="title"
+                                        required
+                                        placeholder="title of book"
+                                        value={data.title}
+                                        onChange={
+                                            (e) => {
+                                                handleTitileChange(e);
+                                            }
+                                        } />
 
-                                <label htmlFor="author">Author</label>
-                                <input
-                                    className="border-2 border-gray-300 p-2 rounded-lg"
-                                    type="text"
-                                    name="author"
-                                    id="author"
-                                    required
-                                    placeholder="author of book"
-                                    value={data.author}
-                                    onChange={
-                                        (e) => {
-                                            handleAuthorChange(e);
+                                    <label htmlFor="author">Author</label>
+                                    <input
+                                        className="border-2 border-gray-300 p-2 rounded-lg"
+                                        type="text"
+                                        name="author"
+                                        id="author"
+                                        required
+                                        placeholder="author of book"
+                                        value={data.author}
+                                        onChange={
+                                            (e) => {
+                                                handleAuthorChange(e);
+                                            }
                                         }
-                                    }
-                                />
+                                    />
 
-                                <label htmlFor="description">Description</label>
-                                <textarea
-                                    className="border-2 border-gray-300 p-2 rounded-lg"
-                                    name="description"
-                                    id="description"
-                                    cols={30}
-                                    rows={10}
-                                    required
-                                    placeholder="Sinopsis of book"
-                                    value={data.description}
-                                    onChange={
-                                        (e) => {
-                                            handleDescriptionChange(e);
+                                    <label htmlFor="description">Description</label>
+                                    <textarea
+                                        className="border-2 border-gray-300 p-2 rounded-lg"
+                                        name="description"
+                                        id="description"
+                                        cols={30}
+                                        rows={10}
+                                        required
+                                        placeholder="Sinopsis of book"
+                                        value={data.description}
+                                        onChange={
+                                            (e) => {
+                                                handleDescriptionChange(e);
+                                            }
                                         }
-                                    }
-                                />
+                                    />
 
-                                <label htmlFor="price">price</label>
-                                <input
-                                    className="border-2 border-gray-300 p-2 rounded-lg appearance-none"
-                                    name="price"
-                                    type="number"
-                                    id="price"
-                                    required
-                                    value={data.price}
-                                    placeholder="price of book"
-                                    onChange={
-                                        (e) => {
-                                            handlePriceChange(e);
+                                    <label htmlFor="price">price</label>
+                                    <input
+                                        className="border-2 border-gray-300 p-2 rounded-lg appearance-none"
+                                        name="price"
+                                        type="number"
+                                        id="price"
+                                        required
+                                        value={data.price}
+                                        placeholder="price of book"
+                                        onChange={
+                                            (e) => {
+                                                handlePriceChange(e);
+                                            }
                                         }
-                                    }
-                                />
-                            </div>
-                            <button type="submit" className="bg-blue-500 hover:bg-blue-700 mt-5  text-white font-bold py-2 px-4 rounded">
-                                {"Create"}
-                            </button>
-                        </form>
+                                    />
+                                </div>
+                                <ModalActions>
+                                    <button
+                                        className="bg-blue-500 hover:bg-blue-700 mt-5 text-white font-bold py-2 px-4 rounded"
+                                        type="submit"
+                                    >
+                                        {"Create Book"}
+                                    </button>
+
+                                    <button
+                                        className="bg-red-500 hover:bg-red-700 mt-5 text-white font-bold py-2 px-4 rounded"
+                                        onClick={() => setShowModal(false)}
+                                    >
+                                        {"Cancel"}
+                                    </button>
+                                </ModalActions>
+                            </form>
+                        </ModalForm>
                     </Modal>
 
-                    {/*mapping list books dari allBooks */}
-                    <ListBooks />
+                    {/* Modal Detail Book */}
+                    {router.query.id && (
+                        <ModalDetail
+                            onClose={backDashboard}
+                        >
+                            <BookDetail bookid={router.query.id} />
+                        </ModalDetail>
+                    )}
+
+                    {/* console log router.query.bookid */}
+
+
+                    <div className="flex flex-col gap-3 mx-24 mt-12">
+                        {/* if books lengt == 0 */}
+                        {allBooks?.length === 0 && (
+                            <div className="flex flex-row gap-3 items-center">
+                                <p className="text-xl font-bold">{"You dont have any book"}</p>
+                            </div>
+                        )}
+                        {allBooks?.map((book, index) => (
+                            <div key={index} className="border border-gray-100 px-4 py-4">
+                                <div className="flex items-center justify-between">
+                                    <Link href={`/dashboard/?id=${book.id}`} as={`/dashboard/${book.id}`} className="flex flex-row justify-around w-full">
+                                        <h5 className="text-xl font-bold border border-r-slate-800 w-full p-3">{book.title}</h5>
+                                        {/* price */}
+                                        <p className="text-xl font-bold border border-l-slate-800 w-full p-3">{book.price}</p>
+                                    </Link>
+                                    <div className="flex gap-3">
+                                        <div>
+                                            <Link href={`editbook/${book.id}`}>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 24 24"
+                                                    fill="currentColor"
+                                                    className="h-6 w-6 text-green-700"
+                                                >
+                                                    <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32l8.4-8.4z" />
+                                                    <path d="M5.25 5.25a3 3 0 00-3 3v10.5a3 3 0 003 3h10.5a3 3 0 003-3V13.5a.75.75 0 00-1.5 0v5.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V8.25a1.5 1.5 0 011.5-1.5h5.25a.75.75 0 000-1.5H5.25z" />
+                                                </svg>
+                                            </Link>
+                                        </div>
+                                        <div
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill="currentColor"
+                                                className="h-6 w-6 text-red-700"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
 
 
                 </Fragment>
@@ -209,36 +299,10 @@ const Dashboard: NextPage = () => {
 
 export default Dashboard;
 
-const ListBooks: React.FC = () => {
 
-    const { data: allBooks, isLoading } = api.books?.allBooks.useQuery();
 
-    if (isLoading) return <>Loading...</>;
 
-    return (
-        <>
-            <div className="flex flex-col gap-3 mx-24 mt-12">
-                {allBooks?.map((book) => (
-                    <div key={book.id} className="flex flex-row gap-3 items-center">
-                        <div className="flex flex-row gap-3">
-                            <p className="text-xl font-bold">{book.title}</p>
-                            <p className="text-xl font-bold">{book.author}</p>
-                            <p className="text-xl font-bold">{book.price}</p>
-                        </div>
-                        <div className="flex flex-row gap-3">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                {"Edit"}
-                            </button>
-                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                {"Delete"}
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </>
-    );
-}
+
 
 
 export const getServerSideProps = async (context: GetServerSidePropsContext,) => {

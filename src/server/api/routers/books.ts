@@ -48,7 +48,6 @@ export const booksRouter = createTRPCRouter({
         select: {
           id: true,
           title: true,
-          author: true,
           price: true,
         },
         orderBy: {
@@ -60,4 +59,24 @@ export const booksRouter = createTRPCRouter({
       console.log("cannot get books", error);
     }
   }),
+
+  // ambil detail buku dari database
+  detailBook: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { id } = input;
+      try {
+        return await ctx.prisma.books.findUnique({
+          where: {
+            id,
+          },
+        });
+      } catch (error) {
+        console.log(`Note detail not found`, error);
+      }
+    }),
 });
