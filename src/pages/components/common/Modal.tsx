@@ -16,7 +16,7 @@ interface ModalDetailProps {
     onClose: () => void;
 }
 
-export const Modal: FC<ModalProps> = ({ children, isOpen, handleCancel, title, description }) => {
+const Modal: FC<ModalProps> = ({ children, isOpen, handleCancel, title, description }) => {
     return (
         <Dialog
             open={isOpen}
@@ -40,6 +40,8 @@ export const Modal: FC<ModalProps> = ({ children, isOpen, handleCancel, title, d
         </Dialog>
     );
 };
+
+export default Modal;
 
 export const ModalForm = ({ children }: { children: React.ReactNode }) => {
     return <div className="flex flex-col gap-4">{children}</div>;

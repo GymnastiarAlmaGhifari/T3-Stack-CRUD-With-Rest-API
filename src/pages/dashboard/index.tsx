@@ -2,7 +2,7 @@ import { GetServerSidePropsContext, type NextPage } from "next";
 import { signOut, useSession, getSession } from "next-auth/react";
 import Head from "next/head";
 import { Fragment, useState } from "react";
-import { Modal, ModalActions, ModalDetail, ModalForm } from "../components/common/Modal";
+import Modal, { ModalActions, ModalDetail, ModalForm } from "../components/common/Modal";
 import { api } from "../../utils/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
