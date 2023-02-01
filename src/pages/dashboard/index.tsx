@@ -112,16 +112,11 @@ const Dashboard: NextPage = () => {
                     {/* button modal create books */}
                     <div className="flex mx-24 mt-12">
                         <button onClick={() => setShowModal(true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            {"Create Book"}
+                            {"Create Books"}
                         </button>
                     </div>
                     {/* modal create books */}
-                    <Modal
-                        title={"Create Book"}
-                        description="Create your book"
-                        isOpen={showModal}
-                        handleCancel={() => setShowModal(false)}
-                    >
+                    <Modal isVisible={showModal} onClose={() => setShowModal(false)}>
                         <ModalForm>
                             {/*mapping list books dari allBooks */}
                             <form
