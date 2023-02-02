@@ -85,6 +85,8 @@ const Dashboard: NextPage = () => {
         router.push("/dashboard").then(console.log).catch(console.error);
     };
 
+
+
     const { data: allBooks, isLoading } = api.books?.allBooks.useQuery();
 
     return (
@@ -236,7 +238,7 @@ const Dashboard: NextPage = () => {
                         <ModalDetail
                             onClose={backDashboard}
                         >
-                            <BookEdit bookid={router.query.editBook} />
+                            <BookEdit bookid={router.query.editBook} onClose={backDashboard} />
 
                         </ModalDetail>
                     )}

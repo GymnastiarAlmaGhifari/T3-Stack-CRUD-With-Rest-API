@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 interface BookEditProps {
     // bookid can any type
     bookid: any
+    onClose: () => void
 }
 
 interface FormData {
@@ -15,7 +16,7 @@ interface FormData {
 }
 
 
-const BookEdit: FC<BookEditProps> = ({ bookid }) => {
+const BookEdit: FC<BookEditProps> = ({ bookid, onClose }) => {
 
     const utils = api.useContext();
 
@@ -132,7 +133,8 @@ const BookEdit: FC<BookEditProps> = ({ bookid }) => {
                     <label htmlFor="price" className="form-label">Price</label>
                     <input type="number" className="form-control" id="price" value={data.price} onChange={handlePriceChange} />
                 </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
+                {/* button submit dan di arahkan ke /dashboard */}
+                <button type="submit" className="btn btn-primary" onClick={onClose}>Submit</button>
             </form>
 
         </>
