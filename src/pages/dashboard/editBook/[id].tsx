@@ -53,13 +53,12 @@ const BookEdit: FC<BookEditProps> = ({ bookid }) => {
 
     const editBook = api.books?.editBook.useMutation({
         onMutate: async () => {
-            // Optimistically update to the new value
-            const invalidateDetailBook = utils.books.detailBook.invalidate();
-            const invalidateAllBooks = utils.books.allBooks.invalidate();
-
-            // Wait for both invalidations to finish
-            await Promise.all([invalidateDetailBook, invalidateAllBooks]);
-        }
+            await utils.books.allBooks.cancel();
+        },
+        onSettled: async () => {
+            await utils.books.allBooks.invalidate();
+            await utils.books.detailBook.invalidate();
+        },
     });
 
     if (isLoading) return <p>Loading...</p>
