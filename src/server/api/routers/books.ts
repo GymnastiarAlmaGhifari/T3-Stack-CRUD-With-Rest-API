@@ -79,4 +79,43 @@ export const booksRouter = createTRPCRouter({
         console.log(`Note detail not found`, error);
       }
     }),
+  editBook: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        title: z
+          .string()
+          .min(3, { message: "Must be 5 or more characters of length!" })
+          .max(200, {
+            message: "Must not be more than 200 characters of length!",
+          })
+          .trim(),
+        author: z
+          .string()
+          .min(3, { message: "Must be 5 or more characters of length!" })
+          .max(200, {
+            message: "Must not be more than 200 characters of length!",
+          }),
+        description: z.string(),
+        price: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, title, author, description, price } = input;
+      try {
+        return await ctx.prisma.books.update({
+          where: {
+            id,
+          },
+          data: {
+            title,
+            author,
+            description,
+            price,
+          },
+        });
+      } catch (error) {
+        console.log(`books update error`, error);
+      }
+    }),
 });

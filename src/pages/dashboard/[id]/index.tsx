@@ -1,32 +1,32 @@
-import React from 'react'
-import { useRouter } from 'next/router'
-import Link from 'next/link';
-import BookDetail from '../../components/common/BookDetail';
+import { FC } from "react"
+import { api } from "../../../utils/api"
 
-const Detail = () => {
+interface BookDetailProps {
+    // bookid can any type
+    bookid: any
+}
 
-    const router = useRouter()
-    const bookid = router.query.id as string
-    console.log(bookid)
+const BookDetail: FC<BookDetailProps> = ({ bookid }) => {
+
+    const { data: messageDetail, isLoading } = api.books?.detailBook.useQuery({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        id: bookid
+    })
+
+    if (isLoading) return <p>Loading...</p>
 
     return (
-        <div className="relative w-screen h-screen bg-white">
-            {/* link to dashboard */}
-            <div className="absolute inset-0">
-                <div className="flex items-center justify-center h-screen">
-                    <div className="w-1/2">
-                        <Link href="/dashboard">
-                            <p>Back to dashboard</p>
-                        </Link>
-                        <h1>Detail</h1>
-                        {/* BookDetail with props bookid */}
-                        <BookDetail bookid={bookid} />
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <>
+            <p className="mx-auto">Book Detail</p>
+            <p>{messageDetail?.id}</p>
+            <p>{messageDetail?.title}</p>
+            <p>{messageDetail?.author}</p>
+            <p>{messageDetail?.description}</p>
+            <p>{messageDetail?.price}</p>
+        </>
     )
 }
 
-export default Detail
+export default BookDetail
+
+

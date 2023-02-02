@@ -6,7 +6,8 @@ import Modal, { ModalActions, ModalDetail, ModalForm } from "../components/commo
 import { api } from "../../utils/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import BookDetail from "../components/common/BookDetail";
+import BookDetail from "./[id]";
+import BookEdit from "./editBook/[id]";
 
 interface FormData {
     title: string;
@@ -31,7 +32,6 @@ const Dashboard: NextPage = () => {
 
 
     const [showModal, setShowModal] = useState<boolean>(false);
-
 
 
     const utils = api.useContext();
@@ -231,7 +231,16 @@ const Dashboard: NextPage = () => {
                         </ModalDetail>
                     )}
 
-                    {/* console log router.query.bookid */}
+                    {/* router ke /dashboard/editBook/[id]  dengan query parameter id */}
+                    {router.query.editBook && (
+                        <ModalDetail
+                            onClose={backDashboard}
+                        >
+                            <BookEdit bookid={router.query.editBook} />
+
+                        </ModalDetail>
+                    )}
+
 
 
                     <div className="flex flex-col gap-3 mx-24 mt-12">
@@ -251,7 +260,7 @@ const Dashboard: NextPage = () => {
                                     </Link>
                                     <div className="flex gap-3">
                                         <div>
-                                            <Link href={`editbook/${book.id}`}>
+                                            <Link href={`/dashboard/?editBook=${book.id}`} as={`/dashboard/editBook/${book.id}`}>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24"
@@ -295,11 +304,6 @@ const Dashboard: NextPage = () => {
 export default Dashboard;
 
 
-
-
-
-
-
 export const getServerSideProps = async (context: GetServerSidePropsContext,) => {
     const session = await getSession(context);
 
@@ -319,4 +323,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext,) =>
     };
 
 }
+
+
+
 
