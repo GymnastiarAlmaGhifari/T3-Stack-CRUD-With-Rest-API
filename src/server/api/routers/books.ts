@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const booksRouter = createTRPCRouter({
@@ -118,4 +117,16 @@ export const booksRouter = createTRPCRouter({
         console.log(`books update error`, error);
       }
     }),
+
+  httpEndPointGetAllBooks: publicProcedure.query(
+    // httpendpoint ke /books
+    async ({ ctx }) => {
+      try {
+        return await ctx.prisma.books.findMany();
+      } catch (error) {
+        console.log(`books update error`, error);
+      }
+    }
+  ),
+  
 });
